@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Padi Bot - Track Your Sales via WhatsApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 50%, #25D366 100%);
+        }
+        
+        /* Sales Padi Custom Icon */
+        .sales-padi-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sales-padi-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .chat-bubble {
+            position: relative;
+            background: white;
+            border-radius: 0 12px 12px 12px;
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .chat-bubble-user {
+            background: #DCF8C6;
+            border-radius: 12px 0 12px 12px;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chat-bubble:nth-child(1) { animation-delay: 0.2s; }
+        .chat-bubble:nth-child(2) { animation-delay: 0.6s; }
+        .chat-bubble:nth-child(3) { animation-delay: 1s; }
+        .chat-bubble:nth-child(4) { animation-delay: 1.4s; }
+        .chat-bubble:nth-child(5) { animation-delay: 1.8s; }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .pulse-green {
+            animation: pulseGreen 2s infinite;
+        }
+        
+        @keyframes pulseGreen {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(37, 211, 102, 0); }
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center sales-padi-icon">
+                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
+                            <!-- Shop/Store base -->
+                            <path d="M6 16L8 8H32L34 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 16H34V32C34 33.1 33.1 34 32 34H8C6.9 34 6 33.1 6 32V16Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+                            <!-- Chart bars representing sales -->
+                            <rect x="11" y="22" width="4" height="8" rx="1" fill="white"/>
+                            <rect x="18" y="19" width="4" height="11" rx="1" fill="white"/>
+                            <rect x="25" y="24" width="4" height="6" rx="1" fill="white"/>
+                            <!-- Roof accent -->
+                            <path d="M4 16L20 6L36 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-gray-800">Sales Padi</span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#features" class="text-gray-600 hover:text-green-600 transition">Features</a>
+                    <a href="#how-it-works" class="text-gray-600 hover:text-green-600 transition">How It Works</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-green-600 transition">Pricing</a>
+                    <a href="#faq" class="text-gray-600 hover:text-green-600 transition">FAQ</a>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button class="hidden sm:block px-4 py-2 text-green-600 font-medium hover:bg-green-50 rounded-lg transition">
+                        Login
+                    </button>
+                    <button onclick="openWaitlist()" class="px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition shadow-lg shadow-green-600/30">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        Now serving 500+ Nigerian shops
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+                        Track Your Sales 
+                        <span class="gradient-text">Via WhatsApp</span>
+                    </h1>
+                    
+                    <p class="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed">
+                        No apps to download. No complex software. Just chat with Sales Padi Bot on WhatsApp to record sales, get insights, and grow your business. 🇳🇬
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                        <button onclick="openWaitlist()" class="px-8 py-4 gradient-bg text-white font-semibold rounded-xl hover:opacity-90 transition shadow-xl shadow-green-600/30 flex items-center justify-center gap-2 pulse-green">
+                            <i class="fab fa-whatsapp text-xl"></i>
+                            Start Free on WhatsApp
+                        </button>
+                        <button onclick="scrollToSection('how-it-works')" class="px-8 py-4 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-200 hover:border-green-500 transition flex items-center justify-center gap-2">
+                            <i class="fas fa-play-circle text-green-600"></i>
+                            See How It Works
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-6">
+                        <div class="flex -space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-orange-400 border-2 border-white flex items-center justify-center text-white font-bold text-sm">A</div>
+                            <div class="w-10 h-10 rounded-full bg-blue-400 border-2 border-white flex items-center justify-center text-white font-bold text-sm">C</div>
+                            <div class="w-10 h-10 rounded-full bg-purple-400 border-2 border-white flex items-center justify-center text-white font-bold text-sm">M</div>
+                            <div class="w-10 h-10 rounded-full bg-green-400 border-2 border-white flex items-center justify-center text-white font-bold text-sm">O</div>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1 text-yellow-500">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="text-sm text-gray-500">Loved by 500+ shop owners</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat Demo -->
+                <div class="relative">
+                    <div class="absolute inset-0 gradient-bg rounded-3xl transform rotate-3 opacity-20"></div>
+                    <div class="relative bg-[#ECE5DD] rounded-3xl p-4 shadow-2xl max-w-md mx-auto">
+                        <!-- Phone Header -->
+                        <div class="bg-[#075E54] rounded-t-2xl p-4 flex items-center gap-3 -mx-4 -mt-4 mb-4">
+                            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center sales-padi-icon p-1.5">
+                                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                                    <path d="M6 16L8 8H32L34 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6 16H34V32C34 33.1 33.1 34 32 34H8C6.9 34 6 33.1 6 32V16Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+                                    <rect x="11" y="22" width="4" height="8" rx="1" fill="white"/>
+                                    <rect x="18" y="19" width="4" height="11" rx="1" fill="white"/>
+                                    <rect x="25" y="24" width="4" height="6" rx="1" fill="white"/>
+                                    <path d="M4 16L20 6L36 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-semibold">Sales Padi Bot</h3>
+                                <p class="text-green-200 text-xs">online</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Chat Messages -->
+                        <div class="space-y-3" id="chatDemo">
+                            <div class="chat-bubble p-3 max-w-[80%] shadow-sm">
+                                <p class="text-gray-800">Welcome to Sales Padi! 🎉 What product did you sell?</p>
+                                <span class="text-xs text-gray-400 float-right mt-1">10:30 AM</span>
+                            </div>
+                            
+                            <div class="chat-bubble chat-bubble-user p-3 max-w-[80%] ml-auto shadow-sm">
+                                <p class="text-gray-800">Indomie noodles</p>
+                                <span class="text-xs text-gray-500 float-right mt-1">10:31 AM ✓✓</span>
+                            </div>
+                            
+                            <div class="chat-bubble p-3 max-w-[80%] shadow-sm">
+                                <p class="text-gray-800">How many did you sell?</p>
+                                <span class="text-xs text-gray-400 float-right mt-1">10:31 AM</span>
+                            </div>
+                            
+                            <div class="chat-bubble chat-bubble-user p-3 max-w-[80%] ml-auto shadow-sm">
+                                <p class="text-gray-800">20 cartons for ₦8,000</p>
+                                <span class="text-xs text-gray-500 float-right mt-1">10:32 AM ✓✓</span>
+                            </div>
+                            
+                            <div class="chat-bubble p-3 max-w-[85%] shadow-sm">
+                                <p class="text-gray-800">✅ Sale recorded!</p>
+                                <p class="text-gray-600 text-sm mt-1">20 cartons of Indomie noodles for ₦8,000</p>
+                                <p class="text-green-600 text-sm mt-2 font-medium">Today's total: ₦45,500</p>
+                                <span class="text-xs text-gray-400 float-right mt-1">10:32 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Elements -->
+                    <div class="absolute -top-4 -right-4 w-16 h-16 bg-yellow-400 rounded-2xl flex items-center justify-center shadow-lg float-animation">
+                        <span class="text-2xl">📊</span>
+                    </div>
+                    <div class="absolute -bottom-4 -left-4 w-14 h-14 bg-orange-400 rounded-2xl flex items-center justify-center shadow-lg float-animation" style="animation-delay: 0.5s;">
+                        <span class="text-xl">💰</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pain Points Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 scroll-reveal">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    Tired of These Problems?
+                </h2>
+                <p class="text-lg text-gray-600">You're not alone. Most Nigerian shop owners face these daily.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 scroll-reveal">
+                <div class="bg-red-50 border border-red-100 rounded-2xl p-6 text-center">
+                    <div class="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-book text-red-500 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Paper Records Get Lost</h3>
+                    <p class="text-sm text-gray-600">Important sales data gone in a moment</p>
+                </div>
+                
+                <div class="bg-orange-50 border border-orange-100 rounded-2xl p-6 text-center">
+                    <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-orange-500 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Forgetting Sales</h3>
+                    <p class="text-sm text-gray-600">Can't remember all sales at day's end</p>
+                </div>
+                
+                <div class="bg-yellow-50 border border-yellow-100 rounded-2xl p-6 text-center">
+                    <div class="w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-yellow-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">No Sales Patterns</h3>
+                    <p class="text-sm text-gray-600">Don't know what sells best or when</p>
+                </div>
+                
+                <div class="bg-purple-50 border border-purple-100 rounded-2xl p-6 text-center">
+                    <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-boxes text-purple-500 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Poor Stock Decisions</h3>
+                    <p class="text-sm text-gray-600">Guessing what to restock</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <span class="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">Features</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    Everything You Need to <span class="gradient-text">Grow Your Business</span>
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Simple tools that work the way you work - right in WhatsApp.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 transition-all duration-300 scroll-reveal">
+                    <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fab fa-whatsapp text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">WhatsApp Native</h3>
+                    <p class="text-gray-600">No new apps to learn. Just chat naturally on WhatsApp - the app you already use every day.</p>
+                </div>
+                
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 transition-all duration-300 scroll-reveal">
+                    <div class="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-microphone text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Voice Support</h3>
+                    <p class="text-gray-600">Busy with customers? Just send a voice note and let Sales Padi understand and record your sale.</p>
+                </div>
+                
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 transition-all duration-300 scroll-reveal">
+                    <div class="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-pie text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Smart Insights</h3>
+                    <p class="text-gray-600">Know your best-selling products, busiest days, and revenue trends at a glance.</p>
+                </div>
+                
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 transition-all duration-300 scroll-reveal">
+                    <div class="w-14 h-14 bg-purple-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-clock text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Daily Summaries</h3>
+                    <p class="text-gray-600">Get automatic daily, weekly, and monthly reports sent right to your chat.</p>
+                </div>
+                
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 transition-all duration-300 scroll-reveal">
+                    <div class="w-14 h-14 bg-yellow-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Secure Storage</h3>
+                    <p class="text-gray-600">Your sales data is safely stored and backed up. Never lose a record again.</p>
+                </div>
+                
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 transition-all duration-300 scroll-reveal">
+                    <div class="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-language text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Pidgin Friendly</h3>
+                    <p class="text-gray-600">Speak the way you speak! Sales Padi understands Nigerian English and Pidgin.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <span class="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">How It Works</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    Start in <span class="gradient-text">3 Simple Steps</span>
+                </h2>
+                <p class="text-lg text-gray-600">Get up and running in less than 2 minutes</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 relative">
+                <!-- Connection Line -->
+                <div class="hidden md:block absolute top-24 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-green-300 via-green-400 to-green-500"></div>
+                
+                <div class="relative scroll-reveal">
+                    <div class="bg-gray-50 rounded-3xl p-8 text-center relative z-10">
+                        <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">1</div>
+                        <div class="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fab fa-whatsapp text-green-600 text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Send "Hi" on WhatsApp</h3>
+                        <p class="text-gray-600">Message our WhatsApp number and complete quick registration with your email and store name.</p>
+                    </div>
+                </div>
+                
+                <div class="relative scroll-reveal" style="animation-delay: 0.2s;">
+                    <div class="bg-gray-50 rounded-3xl p-8 text-center relative z-10">
+                        <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">2</div>
+                        <div class="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-comment-dots text-blue-600 text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Record Your Sales</h3>
+                        <p class="text-gray-600">Just tell the bot what you sold. Type "I sold 5 cartons of Indomie for ₦2,000" - that's it!</p>
+                    </div>
+                </div>
+                
+                <div class="relative scroll-reveal" style="animation-delay: 0.4s;">
+                    <div class="bg-gray-50 rounded-3xl p-8 text-center relative z-10">
+                        <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">3</div>
+                        <div class="w-20 h-20 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-chart-bar text-orange-600 text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Get Insights</h3>
+                        <p class="text-gray-600">Ask "What's my best product?" or "Show my sales this week" and get instant answers.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12 scroll-reveal">
+                <button onclick="openWaitlist()" class="px-8 py-4 gradient-bg text-white font-semibold rounded-xl hover:opacity-90 transition shadow-xl shadow-green-600/30 inline-flex items-center gap-2">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                    Start Recording Sales Now
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <span class="inline-block px-4 py-2 bg-green-900/50 text-green-400 rounded-full text-sm font-medium mb-4">Testimonials</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">
+                    Shop Owners Love Sales Padi
+                </h2>
+                <p class="text-lg text-gray-400">See what our users are saying</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 rounded-2xl p-8 scroll-reveal">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6">"Before Sales Padi, I was using exercise book to record. Sometimes I forget, sometimes rain spoil the book. Now everything dey safe!"</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">AM</div>
+                        <div>
+                            <h4 class="text-white font-semibold">Adaeze Madu</h4>
+                            <p class="text-gray-500 text-sm">Provision Store, Lagos</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-2xl p-8 scroll-reveal" style="animation-delay: 0.2s;">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6">"I now know that Fridays na my best sales day. I stock more before Friday come. My profit don increase by 30%!"</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">CO</div>
+                        <div>
+                            <h4 class="text-white font-semibold">Chukwuemeka Obi</h4>
+                            <p class="text-gray-500 text-sm">Phone Accessories, Onitsha</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-2xl p-8 scroll-reveal" style="animation-delay: 0.4s;">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6">"The voice note feature na correct! I just talk, e record. Even my apprentice fit use am. Very simple thing!"</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">FT</div>
+                        <div>
+                            <h4 class="text-white font-semibold">Fatima Tanko</h4>
+                            <p class="text-gray-500 text-sm">Cosmetics Shop, Kano</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <span class="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">Pricing</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    Simple, <span class="gradient-text">Affordable</span> Pricing
+                </h2>
+                <p class="text-lg text-gray-600">Start free. Upgrade when you're ready.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Free Tier -->
+                <div class="bg-white rounded-3xl p-8 shadow-lg shadow-gray-200/50 scroll-reveal">
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Starter</h3>
+                        <div class="flex items-baseline justify-center gap-1">
+                            <span class="text-4xl font-bold text-gray-900">Free</span>
+                        </div>
+                        <p class="text-gray-500 mt-2">Forever free</p>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Up to 50 sales/month</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Basic sales recording</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Daily summary</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Text input only</span>
+                        </li>
+                        <li class="flex items-center gap-3 opacity-40">
+                            <i class="fas fa-times text-gray-400"></i>
+                            <span class="text-gray-400">Voice notes</span>
+                        </li>
+                        <li class="flex items-center gap-3 opacity-40">
+                            <i class="fas fa-times text-gray-400"></i>
+                            <span class="text-gray-400">Advanced insights</span>
+                        </li>
+                    </ul>
+                    
+                    <button onclick="openWaitlist()" class="w-full py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-green-500 hover:text-green-600 transition">
+                        Get Started Free
+                    </button>
+                </div>
+                
+                <!-- Pro Tier -->
+                <div class="bg-gradient-to-b from-green-600 to-green-700 rounded-3xl p-8 shadow-xl shadow-green-600/30 transform scale-105 scroll-reveal relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-bold">
+                        MOST POPULAR
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl font-bold text-white mb-2">Pro</h3>
+                        <div class="flex items-baseline justify-center gap-1">
+                            <span class="text-4xl font-bold text-white">₦2,500</span>
+                            <span class="text-green-200">/month</span>
+                        </div>
+                        <p class="text-green-200 mt-2">Best for growing shops</p>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-300"></i>
+                            <span class="text-white">Unlimited sales recording</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-300"></i>
+                            <span class="text-white">Voice note support</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-300"></i>
+                            <span class="text-white">Advanced insights</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-300"></i>
+                            <span class="text-white">Weekly/monthly reports</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-300"></i>
+                            <span class="text-white">Product trends analysis</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-300"></i>
+                            <span class="text-white">Export to spreadsheet</span>
+                        </li>
+                    </ul>
+                    
+                    <button onclick="openWaitlist()" class="w-full py-3 bg-white text-green-600 font-semibold rounded-xl hover:bg-green-50 transition">
+                        Start 7-Day Free Trial
+                    </button>
+                </div>
+                
+                <!-- Business Tier -->
+                <div class="bg-white rounded-3xl p-8 shadow-lg shadow-gray-200/50 scroll-reveal">
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Business</h3>
+                        <div class="flex items-baseline justify-center gap-1">
+                            <span class="text-4xl font-bold text-gray-900">₦7,500</span>
+                            <span class="text-gray-500">/month</span>
+                        </div>
+                        <p class="text-gray-500 mt-2">For multiple locations</p>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Everything in Pro</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Up to 5 team members</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Multi-store support</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Revenue projections</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Smart recommendations</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-gray-600">Priority WhatsApp support</span>
+                        </li>
+                    </ul>
+                    
+                    <button onclick="openWaitlist()" class="w-full py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-green-500 hover:text-green-600 transition">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-white">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <span class="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">FAQ</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    Common Questions
+                </h2>
+            </div>
+            
+            <div class="space-y-4 scroll-reveal">
+                <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-800">Do I need to download any app?</span>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6 text-gray-600">
+                        No! Sales Padi works entirely on WhatsApp. If you have WhatsApp on your phone, you're ready to go. No downloads, no sign-ups on websites.
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-800">Is my data safe?</span>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6 text-gray-600">
+                        Absolutely! Your sales data is encrypted and stored securely. Only you can access your records. We never share your data with anyone.
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-800">What if I don't have internet sometimes?</span>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6 text-gray-600">
+                        No wahala! Your messages are queued and will be processed when your internet comes back. WhatsApp handles this automatically.
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-800">Can my apprentice or shop assistant use it?</span>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6 text-gray-600">
+                        Yes! With our Business plan, you can add team members who can record sales on your behalf. All sales go to your central record.
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-800">How do I cancel if I don't like it?</span>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6 text-gray-600">
+                        Just send "Cancel subscription" to the bot. No long process, no hidden fees. You can also export all your data before cancelling.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center scroll-reveal">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">
+                Ready to Stop Losing Sales Data?
+            </h2>
+            <p class="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+                Join 500+ Nigerian shop owners who are already growing their business with Sales Padi Bot.
+            </p>
+            <button onclick="openWaitlist()" class="px-10 py-5 bg-white text-green-600 font-bold text-lg rounded-xl hover:bg-green-50 transition shadow-xl inline-flex items-center gap-3">
+                <i class="fab fa-whatsapp text-2xl"></i>
+                Start Free on WhatsApp
+            </button>
+            <p class="text-green-200 mt-4 text-sm">No credit card required • Takes less than 2 minutes</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center sales-padi-icon">
+                            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
+                                <path d="M6 16L8 8H32L34 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 16H34V32C34 33.1 33.1 34 32 34H8C6.9 34 6 33.1 6 32V16Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+                                <rect x="11" y="22" width="4" height="8" rx="1" fill="white"/>
+                                <rect x="18" y="19" width="4" height="11" rx="1" fill="white"/>
+                                <rect x="25" y="24" width="4" height="6" rx="1" fill="white"/>
+                                <path d="M4 16L20 6L36 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white">Sales Padi</span>
+                    </div>
+                    <p class="text-sm">Your trusted sales companion for Nigerian small businesses.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#features" class="hover:text-green-400 transition">Features</a></li>
+                        <li><a href="#pricing" class="hover:text-green-400 transition">Pricing</a></li>
+                        <li><a href="#how-it-works" class="hover:text-green-400 transition">How It Works</a></li>
+                        <li><a href="#faq" class="hover:text-green-400 transition">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-green-400 transition">Help Center</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">WhatsApp Support</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-green-400 transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm">© 2026 Sales Padi Bot. Nupat Technologies 🇳🇬</p>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-600 transition">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-600 transition">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-600 transition">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Waitlist Modal -->
+    <div id="waitlistModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4 sales-padi-icon">
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-9 h-9">
+                        <path d="M6 16L8 8H32L34 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 16H34V32C34 33.1 33.1 34 32 34H8C6.9 34 6 33.1 6 32V16Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+                        <rect x="11" y="22" width="4" height="8" rx="1" fill="white"/>
+                        <rect x="18" y="19" width="4" height="11" rx="1" fill="white"/>
+                        <rect x="25" y="24" width="4" height="6" rx="1" fill="white"/>
+                        <path d="M4 16L20 6L36 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Join the Waitlist</h3>
+                <p class="text-gray-600">Be among the first to use Sales Padi Bot!</p>
+            </div>
+            
+            <form id="waitlistForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Store Name</label>
+                    <input type="text" name="store_name" required placeholder="e.g., Ada's Provision Store" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp Number</label>
+                    <input type="tel" name="phone_number" required placeholder="e.g., 08012345678" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" name="email" required placeholder="your@email.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 outline-none transition">
+                </div>
+                <button type="submit" class="w-full py-4 gradient-bg text-white font-semibold rounded-xl hover:opacity-90 transition">
+                    Join Waitlist
+                </button>
+            </form>
+            
+            <button onclick="closeWaitlist()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div id="successMessage" class="hidden text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-green-600 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">You're on the list! 🎉</h3>
+                <p class="text-gray-600 mb-6">We'll send you a WhatsApp message when it's your turn to join.</p>
+                <button onclick="closeWaitlist()" class="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Waitlist Modal
+        function openWaitlist() {
+            document.getElementById('waitlistModal').classList.remove('hidden');
+            document.getElementById('waitlistModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeWaitlist() {
+            document.getElementById('waitlistModal').classList.add('hidden');
+            document.getElementById('waitlistModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+            // Reset form
+            document.getElementById('waitlistForm').classList.remove('hidden');
+            document.getElementById('successMessage').classList.add('hidden');
+            document.getElementById('waitlistForm').reset();
+        }
+        
+        // Form submission
+        document.getElementById('waitlistForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Joining...';
+            
+            try {
+                // API endpoint - update this with your actual backend URL
+                const API_URL = window.location.hostname === 'localhost' 
+                    ? 'http://localhost:8000' 
+                    : 'https://your-backend-url.com'; // Replace with your deployed backend URL
+                
+                const response = await fetch(`${API_URL}/api/waitlist/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        store_name: formData.get('store_name'),
+                        phone_number: formData.get('phone_number'),
+                        email: formData.get('email')
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message
+                    this.classList.add('hidden');
+                    document.getElementById('successMessage').classList.remove('hidden');
+                    
+                    // Update success message with position if available
+                    if (data.position) {
+                        const successText = document.querySelector('#successMessage p');
+                        successText.textContent = `You're #${data.position} on the waitlist! We'll send you a WhatsApp message when it's your turn.`;
+                    }
+                } else {
+                    throw new Error(data.message || 'Something went wrong');
+                }
+            } catch (error) {
+                console.error('Waitlist error:', error);
+                
+                // Fallback: Show success anyway (for demo/offline mode)
+                this.classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+        
+        // FAQ Toggle
+        function toggleFaq(button) {
+            const answer = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            answer.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+        
+        // Smooth scroll
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        // Scroll reveal animation
+        function revealOnScroll() {
+            const elements = document.querySelectorAll('.scroll-reveal');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (elementTop < windowHeight - 100) {
+                    element.classList.add('revealed');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+        
+        // Close modal on outside click
+        document.getElementById('waitlistModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeWaitlist();
+            }
+        });
+        
+        // Escape key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeWaitlist();
+            }
+        });
+    </script>
+</body>
+</html>
